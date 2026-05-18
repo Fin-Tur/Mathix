@@ -46,15 +46,21 @@ def run_task(task: Task) -> Solution:
 
 
 if __name__ == "__main__":
-     
-    pdf_path = sys.argv[2] if len(sys.argv) > 2 else None
+
+    pdf_path = sys.argv[1] if len(sys.argv) > 1 else None
 
     if not pdf_path:
-        sys.exit("PDF path not provided.")
+        sys.exit("Usage: python main.py <path_to_pdf>")
 
-    if pdf_path:
-        pdf_text = PDFReader(pdf_path).read_all()
+    pdf_text = PDFReader(pdf_path).read_all()
+
+    if pdf_text.strip():
+        print(f"Extracted text from PDF:\n{pdf_text}\n")
         tasks = extract_tasks_from_pdf(client, pdf_text)
+    else:
+        print("No text found in PDF — falling back to image-based extraction.")
+        image_blocks = PDFReaderIMG.PDFReaderImg(pdf_path).all_as_blocks()
+        tasks = extract_tasks_from_pdf(client, image_blocks=image_blocks)
 
     sols = []
 
