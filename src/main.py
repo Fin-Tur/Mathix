@@ -10,19 +10,33 @@ client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 def run_task(task: Task) -> Solution:
 
-    messages = [{"role": "user", "content": f"{task.description}\nParameters: {task.parameters}"}]
+    content = f"{task.description}\nParameters: {task.parameters}"
+    if task.parameters_global:
+        content += f"\nGlobal context: {task.parameters_global}"
+    messages = [{"role": "user", "content": content}]
 
+    #TODO: Append sols to Task
 
     while True:
 
         response = client.messages.parse(
             model="claude-haiku-4-5",
             max_tokens=1024,
-            system="You are a brilliant mathematican and problem solver. You will be given mathematical problems per text or via pdf and you will solve them using the tools at your disposal.",
+            system =[{
+                "type": "text", 
+                "text": "You are a brilliant mathematican and problem solver. You will be given mathematical problems in the Task format and you will solve them using the tools at your disposal.",
+                "cache_control": {"type": "ephemeral"},
+                }],
             tools=TOOLS,
             output_format=Solution,
             messages=messages,
         )
+
+        u = response.usage
+        print(f"[cache] write={u.cache_creation_input_tokens}  "
+        f"read={u.cache_read_input_tokens}  "
+        f"uncached={u.input_tokens}"
+        f"total(round)={u}")
 
         if response.stop_reason == "end_turn":
             response.parsed_output.task_id = task.id
@@ -55,7 +69,6 @@ if __name__ == "__main__":
     pdf_text = PDFReader(pdf_path).read_all()
 
     if pdf_text.strip():
-        print(f"Extracted text from PDF:\n{pdf_text}\n")
         tasks = extract_tasks_from_pdf(client, pdf_text)
     else:
         print("No text found in PDF — falling back to image-based extraction.")
