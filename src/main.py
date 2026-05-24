@@ -5,58 +5,75 @@ import reader.pdfreader_img as PDFReaderIMG
 from reader.pdfreader import PDFReader
 from models.task import Task, TaskList, Solution, extract_tasks_from_pdf
 from models.tools import TOOLS, TOOL_MAP
+from models.token_cost import TokenModel, calculate_cost, LLM
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-def run_task(task: Task) -> Solution:
+def run_task(task: Task) -> list[Solution]:
 
-    content = f"{task.description}\nParameters: {task.parameters}"
-    if task.parameters_global:
-        content += f"\nGlobal context: {task.parameters_global}"
-    messages = [{"role": "user", "content": content}]
+    solutions = []
 
-    #TODO: Append sols to Task
+    for sub in task.subtasks:
 
-    while True:
+        t_in = 0
+        t_out = 0
+        t_c_read = 0
+        t_c_write = 0
 
-        response = client.messages.parse(
-            model="claude-haiku-4-5",
-            max_tokens=1024,
-            system =[{
-                "type": "text", 
-                "text": "You are a brilliant mathematican and problem solver. You will be given mathematical problems in the Task format and you will solve them using the tools at your disposal.",
-                "cache_control": {"type": "ephemeral"},
-                }],
-            tools=TOOLS,
-            output_format=Solution,
-            messages=messages,
-        )
+        content = f"{task.description}\nTask Parameters: {task.parameters}"
+        content += f"{sub.description}\nSubTask Parameters: {sub.parameters}"
+        
+        if task.sols:
+            content += "The previous solutions are\n:" + "\n".join(task.sols)
 
-        u = response.usage
-        print(f"[cache] write={u.cache_creation_input_tokens}  "
-        f"read={u.cache_read_input_tokens}  "
-        f"uncached={u.input_tokens}"
-        f"total(round)={u}")
+        messages = [{"role": "user", "content": content}]
 
-        if response.stop_reason == "end_turn":
-            response.parsed_output.task_id = task.id
-            return response.parsed_output
+        while True:
+            response = client.messages.parse(
+                model="claude-haiku-4-5",
+                max_tokens=1024,
+                system =[{
+                    "type": "text", 
+                    "text": "You are a brilliant mathematican and problem solver. You will be given mathematical problems in the Task and Subtask format and you will solve them using the tools at your disposal. "
+                    "You have the solutions to the previous subtasks in your context. Calculate every result only once and reuse previous results whenever possible.",
+                    "cache_control": {"type": "ephemeral"},
+                    }],
+                tools=TOOLS,
+                output_format=Solution,
+                messages=messages,
+            )
 
-        if response.stop_reason == "tool_use":
-            messages.append({"role": "assistant", "content": response.content})
+            usage = response.usage
+            t_in += usage.input_tokens
+            t_out += usage.output_tokens
+            t_c_read += usage.cache_read_input_tokens or 0
+            t_c_write += usage.cache_creation_input_tokens or 0
+             
 
-            results = []
-            for block in response.content:
-                if block.type == "tool_use":
-                    print(f"->{block.name}({block.input})")
-                    ergebnis = TOOL_MAP[block.name](**block.input)
-                    results.append({
-                        "type": "tool_result",
-                        "tool_use_id": block.id,
-                        "content": str(ergebnis),
-                    })
+            if response.stop_reason == "end_turn":
+                sol = response.parsed_output
+                sol.tokens = TokenModel(t_in=t_in, t_out=t_out, t_c_read=t_c_read, t_c_write=t_c_write)
+                sol.subtask_id = sub.id
+                task.sols.append(f"Subtask {sub.id} ({sub.description}): {sol.result}")
+                solutions.append(sol)
+                break
 
-            messages.append({"role": "user", "content": results})
+            if response.stop_reason == "tool_use":
+                messages.append({"role": "assistant", "content": response.content})
+                results = []
+                for block in response.content:
+                    if block.type == "tool_use":
+                        print(f"->{block.name}({block.input})")
+                        ergebnis = TOOL_MAP[block.name](**block.input)
+                        results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": str(ergebnis),
+                        })
+
+                messages.append({"role": "user", "content": results})
+            
+    return solutions
 
 
 if __name__ == "__main__":
@@ -69,18 +86,24 @@ if __name__ == "__main__":
     pdf_text = PDFReader(pdf_path).read_all()
 
     if pdf_text.strip():
-        tasks = extract_tasks_from_pdf(client, pdf_text)
+        tasks, extract_cost = extract_tasks_from_pdf(client, pdf_text)
     else:
         print("No text found in PDF — falling back to image-based extraction.")
         image_blocks = PDFReaderIMG.PDFReaderImg(pdf_path).all_as_blocks()
-        tasks = extract_tasks_from_pdf(client, image_blocks=image_blocks)
+        tasks, extract_cost = extract_tasks_from_pdf(client, image_blocks=image_blocks)
 
     sols = []
 
     for task in tasks:
         print(f"Running task {task.id}: {task.description}")
-        solution = run_task(task)
-        sols.append(solution)
-        print(f"Solution for task {task.id}: {solution.result}\nExplanation: {solution.explanation}\n")
+        task_solutions = run_task(task)
+        sols.extend(task_solutions)
+        for sol in task_solutions:
+            print(f"Solution for subtask {sol.subtask_id}: {sol.result}\nExplanation: {sol.explanation}\n")
+
+    cost = calculate_cost([sol.tokens for sol in sols] + [extract_cost], LLM.haiku_45)
+    print(f"\nTotal Cost: {cost}")
+
+
 
 

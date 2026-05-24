@@ -1,5 +1,7 @@
 import anthropic
 from pydantic import BaseModel
+from models.token_cost import TokenModel
+
 
 class SubTask(BaseModel):
      id: int
@@ -17,9 +19,10 @@ class TaskList(BaseModel):
       tasks: list[Task]
 
 class Solution(BaseModel):
-      task_id: int
+      subtask_id: int
       result: str
       explanation: str
+      tokens: TokenModel
 
 _EXTRACT_INSTRUCTION = """Extract all mathematical tasks from the content into the TaskList structure.
 
@@ -46,7 +49,7 @@ RULES:
 - If a value appears in the parent context, put it in Task.parameters — not repeated in each SubTask.
 - Sub-task parameters only contain values unique to that sub-task."""
 
-def extract_tasks_from_pdf(client: anthropic.Anthropic, pdf_text: str = "", image_blocks: list[dict] | None = None) -> list[Task]:
+def extract_tasks_from_pdf(client: anthropic.Anthropic, pdf_text: str = "", image_blocks: list[dict] | None = None) -> tuple[list[Task], TokenModel]:
     if image_blocks:
         content = image_blocks + [{"type": "text", "text": _EXTRACT_INSTRUCTION}]
     else:
@@ -59,5 +62,7 @@ def extract_tasks_from_pdf(client: anthropic.Anthropic, pdf_text: str = "", imag
         output_format=TaskList,
     )
 
-    return response.parsed_output.tasks
+    tokens = TokenModel(t_in=response.usage.input_tokens, t_out=response.usage.output_tokens, t_c_read=0, t_c_write=0)
+
+    return (response.parsed_output.tasks, tokens)
 
