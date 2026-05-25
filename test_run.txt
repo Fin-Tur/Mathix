@@ -1,52 +1,53 @@
-Running task 1: Let f(x) = (x^3 - 8) / (x - 2). Examine the following:
-->solve_limit({'expr': '(x**3 - 8) / (x - 2)', 'variable': 'x', 'point': '2'})
+Running task 1: Let f(x) = (x^3 - 8) / (x - 2). Examine the following:, ['limits', 'calculus']
+->solve_limit({'expr': '(x^3 - 8) / (x - 2)', 'variable': 'x', 'point': '2'})
 ->solve_derivative({'expr': 'x**2 + 2*x + 4', 'variable': 'x'})
 ->find_critical_points({'expr': 'x**4 - 4*x**2', 'variable': 'x'})
 ->classify_critical_points({'expr': 'x**4 - 4*x**2', 'variable': 'x'})
 Solution for subtask 1: 12
-Explanation: The limit of f(x) = (x³ - 8)/(x - 2) as x approaches 2 is 12. Although the function is undefined at x = 2 (causing a 0/0 indeterminate form), we can evaluate the limit by factoring the numerator. Since x³ - 8 = (x - 2)(x² + 2x + 4), the function simplifies to f(x) = x² + 2x + 4 for x ≠ 2. Evaluating at x = 2 gives 4 + 4 + 4 = 12.
+Explanation: The limit of f(x) = (x^3 - 8)/(x - 2) as x approaches 2 is 12. Although the function is undefined at x = 2 (both numerator and denominator equal 0), we can evaluate the limit using factorization. Note that x^3 - 8 = (x - 2)(x^2 + 2x + 4), so f(x) = (x - 2)(x^2 + 2x + 4)/(x - 2) = x^2 + 2x + 4 for x ≠ 2. Therefore, lim_{x→2} f(x) = 2^2 + 2(2) + 4 = 4 + 4 + 4 = 12.
 
 Solution for subtask 2: f'(x) = 2*x + 2
-Explanation: For x ≠ 2, the function f(x) = (x³ - 8)/(x - 2) simplifies to x² + 2x + 4 (since x³ - 8 = (x - 2)(x² + 2x + 4) by factoring the difference of cubes). Taking the derivative of x² + 2x + 4 with respect to x yields f'(x) = 2x + 2, which can also be written as 2(x + 1). This derivative is defined for all x ≠ 2.
+Explanation: For x ≠ 2, the function f(x) = (x³ - 8)/(x - 2) simplifies to x² + 2x + 4 (this follows from the factorization x³ - 8 = (x - 2)(x² + 2x + 4)). Taking the derivative with respect to x: f'(x) = d/dx(x² + 2x + 4) = 2x + 2. Note that this derivative is defined at x = 2, giving f'(2) = 2(2) + 2 = 6, even though the original function f(x) has a removable discontinuity at x = 2.
 
-Solution for subtask 3: Critical points of g(x) = x^4 - 4x^2 are: x = 0 (local maximum), x = √2 ≈ 1.414 (local minimum), and x = -√2 ≈ -1.414 (local minimum).
-Explanation: To find critical points, we solve g'(x) = 0. First, we compute g'(x) = 4x^3 - 8x = 4x(x^2 - 2). Setting g'(x) = 0 gives x = 0, x = √2, and x = -√2. Using the second derivative test with g''(x) = 12x^2 - 8, we classify: At x = 0, g''(0) = -8 < 0 (local maximum); at x = ±√2, g''(±√2) = 12(2) - 8 = 16 > 0 (local minima).
+Solution for subtask 3: Critical points of g(x) = x^4 - 4*x^2 are: x = -√2 (local minimum), x = 0 (local maximum), and x = √2 (local minimum).
+Explanation: To find critical points, we solve g'(x) = 0. Taking the derivative: g'(x) = 4x^3 - 8x = 4x(x^2 - 2). Setting this equal to zero gives x = 0, x = √2, and x = -√2. Using the second derivative test: g''(x) = 12x^2 - 8. At x = 0: g''(0) = -8 < 0, indicating a local maximum. At x = ±√2: g''(±√2) = 24 - 8 = 16 > 0, indicating local minima.
 
 Running task 2: Given the matrix A and vector b:
     A = [[2, 1, -1],
          [4, 3,  1],
          [0, 2,  3]]
-    b = [1, 7, 4]
+    b = [1, 7, 4], ['la_matrices']
 ->matrix_determinant({'A': '[[2, 1, -1], [4, 3, 1], [0, 2, 3]]'})
 ->check_invertible({'A': '[[2, 1, -1], [4, 3, 1], [0, 2, 3]]'})
 ->solve_linear_system({'A': '[[2, 1, -1], [4, 3, 1], [0, 2, 3]]', 'b': '[1, 7, 4]'})
 ->solve_eigenvalues({'A': '[[2, 1, -1], [4, 3, 1], [0, 2, 3]]'})
 ->check_diagonalizable({'A': '[[2, 1, -1], [4, 3, 1], [0, 2, 3]]'})
-Solution for subtask 1: The determinant of A is -6, and A is invertible.
-Explanation: The determinant of the 3×3 matrix A is calculated to be -6. Since the determinant is non-zero (det(A) = -6 ≠ 0), the matrix A is invertible. This means A has a unique inverse A⁻¹, and the linear system Ax = b will have a unique solution.
+->solve_characteristic_polynomial({'A': '[[2, 1, -1], [4, 3, 1], [0, 2, 3]]'})
+Solution for subtask 1: Determinant of A = -6; A is invertible
+Explanation: The determinant of matrix A is -6. Since the determinant is non-zero (det(A) ≠ 0), matrix A is invertible. This means the matrix has full rank and we can find a unique inverse matrix A⁻¹ such that A * A⁻¹ = I.
 
 Solution for subtask 2: x = [2, -1, 2]
-Explanation: The linear system A*x = b has a unique solution since A is invertible (determinant = -6 ≠ 0). Solving the system gives x₁ = 2, x₂ = -1, and x₃ = 2. This can be verified: A*x = [[2(2) + 1(-1) + (-1)(2)], [4(2) + 3(-1) + 1(2)], [0(2) + 2(-1) + 3(2)]] = [[4 - 1 - 2], [8 - 3 + 2], [0 - 2 + 6]] = [1, 7, 4] = b ✓
+Explanation: The linear system A*x = b has a unique solution since A is invertible (determinant = -6 ≠ 0). Using Gaussian elimination or matrix methods, we solve for x and obtain x = [2, -1, 2]. This can be verified: A*x = [[2,1,-1],[4,3,1],[0,2,3]] * [2,-1,2] = [2*2 + 1*(-1) + (-1)*2, 4*2 + 3*(-1) + 1*2, 0*2 + 2*(-1) + 3*2] = [4 - 1 - 2, 8 - 3 + 2, -2 + 6] = [1, 7, 4] = b ✓
 
-Solution for subtask 3: The eigenvalues of A are three distinct real values (given in algebraic form by the cubic formula), and A is diagonalizable.
-Explanation: To find the eigenvalues of matrix A, we compute the characteristic polynomial det(A - λI) = 0. The eigenvalues are the roots of this cubic polynomial. The computation shows three eigenvalues with algebraic multiplicity 1 each. Since the matrix is 3×3 with three distinct eigenvalues, it is guaranteed to be diagonalizable. A matrix is diagonalizable if and only if the algebraic multiplicity of each eigenvalue equals its geometric multiplicity. For distinct eigenvalues, this condition is automatically satisfied because each eigenvalue has exactly one linearly independent eigenvector. The check_diagonalizable function confirms that A is indeed diagonalizable over the complex numbers.
+Solution for subtask 3: The eigenvalues of A are the roots of the characteristic polynomial -λ³ + 8λ² - 15λ - 6 = 0, which has three distinct eigenvalues (all with algebraic multiplicity 1). A is diagonalizable.
+Explanation: The characteristic polynomial is det(A - λI) = -λ³ + 8λ² - 15λ - 6. The three eigenvalues have algebraic multiplicity 1 each (as shown in the eigenvalues output). Since the matrix is 3×3 and has 3 distinct eigenvalues with algebraic multiplicities that sum to 3, the matrix is diagonalizable. This is confirmed by the check_diagonalizable function which returns True. Alternatively, a matrix is diagonalizable over the complex numbers if and only if for each eigenvalue, the algebraic multiplicity equals the geometric multiplicity. Since all eigenvalues are distinct (multiplicity 1), this condition is automatically satisfied.
 
-Running task 3: Consider the function h(x) = x * exp(-x) on [0, oo). Given the vectors v1 = [1, 2, 2] and v2 = [2, 1, -2]:
-->solve_improper_integral({'expr': 'x*exp(-x)', 'variable': 'x', 'a': '0', 'b': 'oo'})
-->solve_indefinite_integral({'expr': 'x*exp(-x)', 'variable': 'x'})
+Running task 3: Consider the function h(x) = x * exp(-x) on [0, oo). Given the vectors v1 = [1, 2, 2] and v2 = [2, 1, -2]:, ['calculus', 'la_vectors']
+->solve_improper_integral({'expr': 'x * exp(-x)', 'variable': 'x', 'a': '0', 'b': 'oo'})
+->solve_indefinite_integral({'expr': 'x * exp(-x)', 'variable': 'x'})
 ->check_orthogonal({'v1': '[1, 2, 2]', 'v2': '[2, 1, -2]'})
 ->vector_projection({'v': '[1, 2, 2]', 'onto': '[2, 1, -2]'})
 Solution for subtask 1: 1
-Explanation: The improper integral of x*exp(-x) from 0 to infinity equals 1. This is a standard integral that can be solved using integration by parts or recognized as a Gamma function: ∫₀^∞ x*e^(-x) dx = Γ(2) = 1! = 1. Alternatively, using integration by parts with u = x and dv = e^(-x)dx, we get: [-x*e^(-x)]₀^∞ + ∫₀^∞ e^(-x) dx = 0 + [-e^(-x)]₀^∞ = 0 - (-1) = 1.
+Explanation: We computed the improper integral of h(x) = x * exp(-x) from 0 to infinity. This integral converges because the exponential decay dominates the linear growth of x. Using integration by parts or the definition of the Gamma function (Γ(n) = ∫₀^∞ t^(n-1)e^(-t) dt), we find that ∫₀^∞ x * e^(-x) dx = Γ(2) = 1! = 1.
 
-Solution for subtask 2: -( x + 1 ) * exp( -x ) + C
-Explanation: Using integration by parts with u = x and dv = exp(-x)dx, we get du = dx and v = -exp(-x). The indefinite integral of h(x) = x*exp(-x) is -(x+1)*exp(-x) + C, where C is the constant of integration. This antiderivative can be verified by taking its derivative: d/dx[-(x+1)*exp(-x) + C] = -exp(-x) - (x+1)*(-exp(-x)) = -exp(-x) + (x+1)*exp(-x) = x*exp(-x), which matches our original function.
+Solution for subtask 2: (-x - 1)*exp(-x) + C
+Explanation: Using integration by parts with u = x and dv = exp(-x)dx, we get du = dx and v = -exp(-x). Applying the integration by parts formula: ∫x*exp(-x)dx = -x*exp(-x) - ∫(-exp(-x))dx = -x*exp(-x) + ∫exp(-x)dx = -x*exp(-x) - exp(-x) + C = -(x+1)*exp(-x) + C. This matches the result from Subtask 1 since the antiderivative evaluated at the limits [0, ∞) gives: lim(x→∞)[-(x+1)e^(-x)] - [-(0+1)e^0] = 0 - (-1) = 1.
 
 Solution for subtask 3: Yes, v1 and v2 are orthogonal
 Explanation: Two vectors are orthogonal if and only if their dot product equals zero. Computing v1 · v2 = (1)(2) + (2)(1) + (2)(-2) = 2 + 2 - 4 = 0. Since the dot product is zero, the vectors v1 = [1, 2, 2] and v2 = [2, 1, -2] are orthogonal.
 
 Solution for subtask 4: [0, 0, 0]
-Explanation: The projection of v1 onto v2 is the zero vector. This is a direct consequence of Subtask 3, which established that v1 and v2 are orthogonal (their dot product is zero). When two vectors are orthogonal, the projection of one onto the other is always the zero vector, since there is no component of v1 in the direction of v2.
+Explanation: The projection of v1 onto v2 is the zero vector. This is expected because, as confirmed in Subtask 3, v1 and v2 are orthogonal vectors (their dot product is zero). When two vectors are orthogonal, the projection of one onto the other is always the zero vector, since there is no component of v1 in the direction of v2.
 
 
-Total Cost: 0.14313825000000002
+Total Cost: 0.0722504 

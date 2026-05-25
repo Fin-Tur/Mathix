@@ -5,7 +5,7 @@ from enum import Enum
 
 class LLM(Enum):
     sonnett_46 = {"input": 3.0, "output": 15.0, "cache_read": 0.3, "cache_write": 3.75}
-    haiku_45 = {"input": 0.8, "output": 4.0, "cache_read": 0.08, "cache_write": 1.0}
+    haiku_45 = {"input": 1.0, "output": 5.0, "cache_read": 0.10, "cache_write": 1.25}
 
 class TokenModel(BaseModel):
     t_in: int

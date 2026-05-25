@@ -1,7 +1,14 @@
 import anthropic
+from typing import Literal
 from pydantic import BaseModel
 from models.token_cost import TokenModel
 
+TaskCategory = Literal[
+    "limits", "calculus", "series",
+    "la_vectors", "la_matrices",
+    "multivar", "multivar_integrals", "vector_analysis", "ode",
+    "proof",
+]
 
 class SubTask(BaseModel):
      id: int
@@ -13,6 +20,7 @@ class Task(BaseModel):
       description: str
       parameters: dict
       subtasks: list[SubTask]
+      categories: list[TaskCategory]
       sols: list[str]
 
 class TaskList(BaseModel):
@@ -38,6 +46,18 @@ Task.parameters   — Shared values defined at the top level and reused across s
                     Empty dict if nothing is shared.
 Task.subtasks     — One SubTask per lettered/numbered part. If no sub-parts exist, one SubTask
                     containing the whole problem.
+Task.categories   — One or more math domains required by this task. Choose from:
+                    "limits"             — limits, sequences, continuity
+                    "calculus"           — derivatives, integrals (single-variable)
+                    "series"             — Taylor/Maclaurin series, convergence radius
+                    "la_vectors"         — vectors, vector spaces, orthogonality, Gram-Schmidt
+                    "la_matrices"        — matrices, linear systems, eigenvalues, decompositions
+                    "multivar"           — partial derivatives, gradient, Hessian, Lagrange, Jacobian
+                    "multivar_integrals" — double/triple integrals, line integrals
+                    "vector_analysis"    — divergence, curl, Laplacian, conservative fields, potential
+                    "ode"                — ordinary differential equations
+                    "proof"              — proofs by induction or other formal arguments
+                    A task may require multiple categories, e.g. ["multivar", "multivar_integrals"].
 Task.sols         — Always [].
 
 SubTask.description — Full verbatim text of this sub-task only.
@@ -65,4 +85,3 @@ def extract_tasks_from_pdf(client: anthropic.Anthropic, pdf_text: str = "", imag
     tokens = TokenModel(t_in=response.usage.input_tokens, t_out=response.usage.output_tokens, t_c_read=0, t_c_write=0)
 
     return (response.parsed_output.tasks, tokens)
-

@@ -1,5 +1,7 @@
+0) Skills für Beweise
 1) PDF Builder
 2) Error handling when parsing doc
-3) ana2
-4) optimizing model costs
-5) frontend, structure, RESTAPI (cloudflared tunnel pi ?)
+3) frontend, structure, RESTAPI (cloudflared tunnel pi ?)
+4) GCD
+5) RAG few shot
+6) 

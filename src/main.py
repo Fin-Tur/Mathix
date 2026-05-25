@@ -4,7 +4,7 @@ import anthropic
 import reader.pdfreader_img as PDFReaderIMG
 from reader.pdfreader import PDFReader
 from models.task import Task, TaskList, Solution, extract_tasks_from_pdf
-from models.tools import TOOLS, TOOL_MAP
+from models.tools import get_tools, TOOL_MAP
 from models.token_cost import TokenModel, calculate_cost, LLM
 
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
@@ -33,12 +33,13 @@ def run_task(task: Task) -> list[Solution]:
                 model="claude-haiku-4-5",
                 max_tokens=1024,
                 system =[{
-                    "type": "text", 
-                    "text": "You are a brilliant mathematican and problem solver. You will be given mathematical problems in the Task and Subtask format and you will solve them using the tools at your disposal. "
-                    "You have the solutions to the previous subtasks in your context. Calculate every result only once and reuse previous results whenever possible.",
+                    "type": "text",
+                    "text": "You are a brilliant mathematician and problem solver. You will be given mathematical problems in the Task and Subtask format and you will solve them using the tools at your disposal. "
+                    "You have the solutions to the previous subtasks in your context. Calculate every result only once and reuse previous results whenever possible.\n"
+                    "Input formats: vectors as JSON strings e.g. '[1,2,3]', matrices as nested JSON strings e.g. '[[1,2],[3,4]]', infinity as 'oo', negative infinity as '-oo'.",
                     "cache_control": {"type": "ephemeral"},
                     }],
-                tools=TOOLS,
+                tools=get_tools(task.categories),
                 output_format=Solution,
                 messages=messages,
             )
@@ -95,7 +96,7 @@ if __name__ == "__main__":
     sols = []
 
     for task in tasks:
-        print(f"Running task {task.id}: {task.description}")
+        print(f"Running task {task.id}: {task.description}, {task.categories}")
         task_solutions = run_task(task)
         sols.extend(task_solutions)
         for sol in task_solutions:

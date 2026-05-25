@@ -2,6 +2,9 @@ import sympy as sp
 from sympy.calculus.util import singularities
 from sympy.calculus.accumulationbounds import AccumulationBounds
 
+def calculate(expr: sp.Expr) -> sp.Expr:
+    return sp.simplify(expr)
+
 # ── Series and Limits ──────────────────────────────────────────────────────
 
 def solve_limit(f: sp.Expr, variable: sp.Symbol, point) -> sp.Expr:
@@ -168,3 +171,21 @@ def check_series_convergence(f: sp.Expr, n: sp.Symbol) -> dict:
     result = s.doit()
     converges = bool(result.is_finite and not result.has(sp.oo, sp.zoo, sp.nan))
     return {"converges": converges, "sum": result}
+
+def solve_radius_of_convergence(a_n: sp.Expr, n: sp.Symbol) -> sp.Expr:
+    try:
+        ratio = sp.Abs(a_n / a_n.subs(n, n + 1))
+        R = sp.limit(ratio, n, sp.oo)
+        if R == 0:
+            return sp.oo
+        if not R.is_finite:
+            return sp.Integer(0)
+        return R
+    except Exception:
+        root = sp.Abs(a_n) ** (sp.Rational(1, 1) / n)
+        L = sp.limit(root, n, sp.oo)
+        if L == 0:
+            return sp.oo
+        if not L.is_finite:
+            return sp.Integer(0)
+        return 1 / L

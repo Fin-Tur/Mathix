@@ -1,16 +1,15 @@
 import functions.wrapper as wrapper
 
-TOOLS = [
-    # ── Limits & Sequences ───────────────────────────────────────────────────
+_TOOLS_LIMITS = [
     {
         "name": "solve_limit",
         "description": "Calculates the limit of a function as the variable approaches a point.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The expression, e.g. 'sin(x)/x'"},
-                "variable": {"type": "string", "description": "The variable, e.g. 'x'"},
-                "point":    {"type": "string", "description": "The point to approach, e.g. '0' or 'oo'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "point":    {"type": "string"},
             },
             "required": ["expr", "variable", "point"],
         },
@@ -21,10 +20,10 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":      {"type": "string", "description": "The expression"},
-                "variable":  {"type": "string", "description": "The variable"},
-                "point":     {"type": "string", "description": "The point to approach"},
-                "direction": {"type": "string", "enum": ["+", "-"], "description": "'+' for right-sided, '-' for left-sided"},
+                "expr":      {"type": "string"},
+                "variable":  {"type": "string"},
+                "point":     {"type": "string"},
+                "direction": {"type": "string", "enum": ["+", "-"]},
             },
             "required": ["expr", "variable", "point", "direction"],
         },
@@ -35,8 +34,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The sequence expression, e.g. '1/n'"},
-                "variable": {"type": "string", "description": "The sequence index variable, e.g. 'n'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
             },
             "required": ["expr", "variable"],
         },
@@ -47,22 +46,21 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr": {"type": "string", "description": "The sequence expression, e.g. '(1 + 1/n)**n'"},
-                "n":    {"type": "string", "description": "The index variable, e.g. 'n'"},
+                "expr": {"type": "string"},
+                "n":    {"type": "string"},
             },
             "required": ["expr", "n"],
         },
     },
-    # ── Continuity ───────────────────────────────────────────────────────────
     {
         "name": "check_continuity",
         "description": "Checks whether a function is continuous at a given point.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
-                "point":    {"type": "string", "description": "The point to check"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "point":    {"type": "string"},
             },
             "required": ["expr", "variable", "point"],
         },
@@ -73,21 +71,23 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
             },
             "required": ["expr", "variable"],
         },
     },
-    # ── Differential Calculus ────────────────────────────────────────────────
+]
+
+_TOOLS_CALCULUS = [
     {
         "name": "solve_derivative",
         "description": "Calculates the first derivative of a function with respect to a variable.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The expression, e.g. 'x**3 + 2*x'"},
-                "variable": {"type": "string", "description": "The differentiation variable, e.g. 'x'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
             },
             "required": ["expr", "variable"],
         },
@@ -98,9 +98,9 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The expression"},
-                "variable": {"type": "string", "description": "The differentiation variable"},
-                "n":        {"type": "string", "description": "The order of differentiation, e.g. '2'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "n":        {"type": "string"},
             },
             "required": ["expr", "variable", "n"],
         },
@@ -111,9 +111,9 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
-                "point":    {"type": "string", "description": "The x-value of the point of tangency"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "point":    {"type": "string"},
             },
             "required": ["expr", "variable", "point"],
         },
@@ -124,8 +124,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
             },
             "required": ["expr", "variable"],
         },
@@ -136,8 +136,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
             },
             "required": ["expr", "variable"],
         },
@@ -148,24 +148,23 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr": {"type": "string", "description": "The implicit equation (= 0 assumed), e.g. 'x**2 + y**2 - 4'"},
-                "x":    {"type": "string", "description": "The independent variable, e.g. 'x'"},
-                "y":    {"type": "string", "description": "The dependent variable, e.g. 'y'"},
+                "expr": {"type": "string"},
+                "x":    {"type": "string"},
+                "y":    {"type": "string"},
             },
             "required": ["expr", "x", "y"],
         },
     },
-    # ── Integral Calculus ────────────────────────────────────────────────────
     {
         "name": "solve_integral",
         "description": "Calculates a definite integral.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":      {"type": "string", "description": "The integrand, e.g. 'x**2'"},
-                "integrand": {"type": "string", "description": "The integration variable, e.g. 'x'"},
-                "a":         {"type": "string", "description": "Lower limit"},
-                "b":         {"type": "string", "description": "Upper limit"},
+                "expr":      {"type": "string"},
+                "integrand": {"type": "string"},
+                "a":         {"type": "string"},
+                "b":         {"type": "string"},
             },
             "required": ["expr", "integrand", "a", "b"],
         },
@@ -176,8 +175,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The integrand"},
-                "variable": {"type": "string", "description": "The integration variable"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
             },
             "required": ["expr", "variable"],
         },
@@ -188,10 +187,10 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The integrand"},
-                "variable": {"type": "string", "description": "The integration variable"},
-                "a":        {"type": "string", "description": "Lower limit, e.g. '0' or '-oo'"},
-                "b":        {"type": "string", "description": "Upper limit, e.g. 'oo'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "a":        {"type": "string"},
+                "b":        {"type": "string"},
             },
             "required": ["expr", "variable", "a", "b"],
         },
@@ -202,10 +201,10 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
-                "a":        {"type": "string", "description": "Start of interval"},
-                "b":        {"type": "string", "description": "End of interval"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "a":        {"type": "string"},
+                "b":        {"type": "string"},
             },
             "required": ["expr", "variable", "a", "b"],
         },
@@ -216,11 +215,11 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr1":    {"type": "string", "description": "First function"},
-                "expr2":    {"type": "string", "description": "Second function"},
-                "variable": {"type": "string", "description": "The variable"},
-                "a":        {"type": "string", "description": "Left boundary"},
-                "b":        {"type": "string", "description": "Right boundary"},
+                "expr1":    {"type": "string"},
+                "expr2":    {"type": "string"},
+                "variable": {"type": "string"},
+                "a":        {"type": "string"},
+                "b":        {"type": "string"},
             },
             "required": ["expr1", "expr2", "variable", "a", "b"],
         },
@@ -231,26 +230,28 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
-                "a":        {"type": "string", "description": "Start of interval"},
-                "b":        {"type": "string", "description": "End of interval"},
-                "axis":     {"type": "string", "enum": ["x", "y"], "description": "'x' for disc method, 'y' for shell method"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "a":        {"type": "string"},
+                "b":        {"type": "string"},
+                "axis":     {"type": "string", "enum": ["x", "y"]},
             },
             "required": ["expr", "variable", "a", "b", "axis"],
         },
     },
-    # ── Series ───────────────────────────────────────────────────────────────
+]
+
+_TOOLS_SERIES = [
     {
         "name": "solve_taylor_series",
         "description": "Computes the Taylor series of a function around a point up to order n. Raises an error if the function is not analytic there.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The expansion variable"},
-                "point":    {"type": "string", "description": "The expansion point, e.g. '0'"},
-                "n":        {"type": "string", "description": "Number of terms (order), e.g. '5'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "point":    {"type": "string"},
+                "n":        {"type": "string"},
             },
             "required": ["expr", "variable", "point", "n"],
         },
@@ -261,9 +262,9 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr":     {"type": "string", "description": "The function expression"},
-                "variable": {"type": "string", "description": "The variable"},
-                "n":        {"type": "string", "description": "Number of terms (order), e.g. '6'"},
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+                "n":        {"type": "string"},
             },
             "required": ["expr", "variable", "n"],
         },
@@ -274,12 +275,27 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "expr": {"type": "string", "description": "General term of the series, e.g. '1/n**2'"},
-                "n":    {"type": "string", "description": "Summation index variable, e.g. 'n'"},
+                "expr": {"type": "string"},
+                "n":    {"type": "string"},
             },
             "required": ["expr", "n"],
         },
     },
+    {
+        "name": "solve_radius_of_convergence",
+        "description": "Computes the radius of convergence of the power series with general term a_n (given as expr in variable). Uses ratio test, falls back to root test.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+            },
+            "required": ["expr", "variable"],
+        },
+    },
+]
+
+_TOOLS_LA_VECTORS = [
     # ── Vectors ──────────────────────────────────────────────────────────────
     {
         "name": "vector_dot_product",
@@ -287,8 +303,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v1": {"type": "string", "description": "First vector as JSON array, e.g. '[1, 2, 3]'"},
-                "v2": {"type": "string", "description": "Second vector as JSON array"},
+                "v1": {"type": "string"},
+                "v2": {"type": "string"},
             },
             "required": ["v1", "v2"],
         },
@@ -299,8 +315,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v1": {"type": "string", "description": "First 3D vector as JSON array, e.g. '[1, 0, 0]'"},
-                "v2": {"type": "string", "description": "Second 3D vector as JSON array"},
+                "v1": {"type": "string"},
+                "v2": {"type": "string"},
             },
             "required": ["v1", "v2"],
         },
@@ -311,8 +327,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v": {"type": "string", "description": "Vector as JSON array, e.g. '[3, 4]'"},
-                "p": {"type": "string", "description": "Norm order, e.g. '2' for Euclidean, '1' for Manhattan (default: '2')"},
+                "v": {"type": "string"},
+                "p": {"type": "string"},
             },
             "required": ["v"],
         },
@@ -323,7 +339,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v": {"type": "string", "description": "Vector as JSON array"},
+                "v": {"type": "string"},
             },
             "required": ["v"],
         },
@@ -334,8 +350,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v1": {"type": "string", "description": "First vector as JSON array"},
-                "v2": {"type": "string", "description": "Second vector as JSON array"},
+                "v1": {"type": "string"},
+                "v2": {"type": "string"},
             },
             "required": ["v1", "v2"],
         },
@@ -346,8 +362,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v":    {"type": "string", "description": "Vector to project, as JSON array"},
-                "onto": {"type": "string", "description": "Target vector, as JSON array"},
+                "v":    {"type": "string"},
+                "onto": {"type": "string"},
             },
             "required": ["v", "onto"],
         },
@@ -358,229 +374,10 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v1": {"type": "string", "description": "First vector as JSON array"},
-                "v2": {"type": "string", "description": "Second vector as JSON array"},
+                "v1": {"type": "string"},
+                "v2": {"type": "string"},
             },
             "required": ["v1", "v2"],
-        },
-    },
-    # ── Matrices — Basic Operations ──────────────────────────────────────────
-    {
-        "name": "matrix_add",
-        "description": "Adds two matrices A + B.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Matrix A as nested JSON array, e.g. '[[1,2],[3,4]]'"},
-                "B": {"type": "string", "description": "Matrix B as nested JSON array"},
-            },
-            "required": ["A", "B"],
-        },
-    },
-    {
-        "name": "matrix_multiply",
-        "description": "Multiplies two matrices A @ B.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Matrix A as nested JSON array"},
-                "B": {"type": "string", "description": "Matrix B as nested JSON array"},
-            },
-            "required": ["A", "B"],
-        },
-    },
-    {
-        "name": "matrix_transpose",
-        "description": "Returns the transpose of a matrix.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "matrix_inverse",
-        "description": "Returns the inverse of a square matrix. Raises an error if the matrix is singular.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "matrix_power",
-        "description": "Raises a square matrix to the integer power n (A^n).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-                "n": {"type": "string", "description": "Integer exponent, e.g. '3'"},
-            },
-            "required": ["A", "n"],
-        },
-    },
-    {
-        "name": "matrix_trace",
-        "description": "Returns the trace of a matrix (sum of diagonal elements).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    # ── Determinant & Rank ───────────────────────────────────────────────────
-    {
-        "name": "matrix_determinant",
-        "description": "Computes the determinant of a square matrix.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "matrix_rank",
-        "description": "Returns the rank of a matrix.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "check_invertible",
-        "description": "Checks whether a matrix is invertible (det ≠ 0).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "matrix_nullity",
-        "description": "Returns the nullity of a matrix (number of columns minus rank).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    # ── Linear Systems ───────────────────────────────────────────────────────
-    {
-        "name": "solve_linear_system",
-        "description": "Solves the linear system Ax = b. Returns the solution set (unique, parametric, or raises an error if inconsistent).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Coefficient matrix as nested JSON array"},
-                "b": {"type": "string", "description": "Right-hand side vector as JSON array, e.g. '[1, 2, 3]'"},
-            },
-            "required": ["A", "b"],
-        },
-    },
-    {
-        "name": "solve_homogeneous_system",
-        "description": "Solves Ax = 0 and returns a basis for the solution space (null space).",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Coefficient matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "gaussian_elimination",
-        "description": "Performs Gaussian elimination on the augmented matrix [A|b] and returns the RREF, pivot columns, and rank.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Coefficient matrix as nested JSON array"},
-                "b": {"type": "string", "description": "Right-hand side vector as JSON array"},
-            },
-            "required": ["A", "b"],
-        },
-    },
-    {
-        "name": "check_system_consistency",
-        "description": "Checks whether the system Ax = b is consistent (has at least one solution) by comparing ranks.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Coefficient matrix as nested JSON array"},
-                "b": {"type": "string", "description": "Right-hand side vector as JSON array"},
-            },
-            "required": ["A", "b"],
-        },
-    },
-    # ── Eigenvalues & Eigenvectors ───────────────────────────────────────────
-    {
-        "name": "solve_eigenvalues",
-        "description": "Returns the eigenvalues of a square matrix as a dict {eigenvalue: algebraic multiplicity}.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "solve_eigenvectors",
-        "description": "Returns the eigenvectors of a matrix as a list of (eigenvalue, multiplicity, [eigenvectors]) tuples.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "solve_characteristic_polynomial",
-        "description": "Returns the characteristic polynomial det(A - λI) as an expression in lambda.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "matrix_diagonalize",
-        "description": "Diagonalizes a matrix, returning (P, D) such that A = P * D * P⁻¹. Raises an error if not diagonalizable.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
-        },
-    },
-    {
-        "name": "check_diagonalizable",
-        "description": "Checks whether a matrix is diagonalizable over the complex numbers.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
-            },
-            "required": ["A"],
         },
     },
     # ── Vector Spaces ────────────────────────────────────────────────────────
@@ -590,7 +387,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -601,7 +398,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -612,7 +409,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -623,7 +420,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "vectors": {"type": "string", "description": "JSON array of vectors, e.g. '[[1,0,0],[0,1,0]]'"},
+                "vectors": {"type": "string"},
             },
             "required": ["vectors"],
         },
@@ -634,7 +431,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "vectors": {"type": "string", "description": "JSON array of vectors, e.g. '[[1,0],[0,1],[1,1]]'"},
+                "vectors": {"type": "string"},
             },
             "required": ["vectors"],
         },
@@ -645,8 +442,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v":     {"type": "string", "description": "Vector as JSON array, e.g. '[3, 5]'"},
-                "basis": {"type": "string", "description": "JSON array of basis vectors, e.g. '[[1,1],[1,-1]]'"},
+                "v":     {"type": "string"},
+                "basis": {"type": "string"},
             },
             "required": ["v", "basis"],
         },
@@ -657,9 +454,9 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A":         {"type": "string", "description": "Matrix of the linear map in old_basis, as nested JSON array"},
-                "old_basis": {"type": "string", "description": "JSON array of old basis vectors"},
-                "new_basis": {"type": "string", "description": "JSON array of new basis vectors"},
+                "A":         {"type": "string"},
+                "old_basis": {"type": "string"},
+                "new_basis": {"type": "string"},
             },
             "required": ["A", "old_basis", "new_basis"],
         },
@@ -671,7 +468,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "vectors": {"type": "string", "description": "JSON array of linearly independent vectors"},
+                "vectors": {"type": "string"},
             },
             "required": ["vectors"],
         },
@@ -682,21 +479,9 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "subspace": {"type": "string", "description": "JSON array of vectors spanning the subspace"},
+                "subspace": {"type": "string"},
             },
             "required": ["subspace"],
-        },
-    },
-    {
-        "name": "solve_least_squares",
-        "description": "Computes the least-squares solution to the overdetermined system Ax ≈ b.",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
-                "b": {"type": "string", "description": "Right-hand side vector as JSON array"},
-            },
-            "required": ["A", "b"],
         },
     },
     {
@@ -705,10 +490,245 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "v":        {"type": "string", "description": "Vector to project, as JSON array"},
-                "subspace": {"type": "string", "description": "JSON array of vectors spanning the subspace"},
+                "v":        {"type": "string"},
+                "subspace": {"type": "string"},
             },
             "required": ["v", "subspace"],
+        },
+    },
+]
+
+_TOOLS_LA_MATRICES = [
+    # ── Matrices — Basic Operations ──────────────────────────────────────────
+    {
+        "name": "matrix_add",
+        "description": "Adds two matrices A + B.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "B": {"type": "string"},
+            },
+            "required": ["A", "B"],
+        },
+    },
+    {
+        "name": "matrix_multiply",
+        "description": "Multiplies two matrices A @ B.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "B": {"type": "string"},
+            },
+            "required": ["A", "B"],
+        },
+    },
+    {
+        "name": "matrix_transpose",
+        "description": "Returns the transpose of a matrix.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "matrix_inverse",
+        "description": "Returns the inverse of a square matrix. Raises an error if the matrix is singular.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "matrix_power",
+        "description": "Raises a square matrix to the integer power n (A^n).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "n": {"type": "string"},
+            },
+            "required": ["A", "n"],
+        },
+    },
+    {
+        "name": "matrix_trace",
+        "description": "Returns the trace of a matrix (sum of diagonal elements).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    # ── Determinant & Rank ───────────────────────────────────────────────────
+    {
+        "name": "matrix_determinant",
+        "description": "Computes the determinant of a square matrix.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "matrix_rank",
+        "description": "Returns the rank of a matrix.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "check_invertible",
+        "description": "Checks whether a matrix is invertible (det ≠ 0).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "matrix_nullity",
+        "description": "Returns the nullity of a matrix (number of columns minus rank).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    # ── Linear Systems ───────────────────────────────────────────────────────
+    {
+        "name": "solve_linear_system",
+        "description": "Solves the linear system Ax = b. Returns the solution set (unique, parametric, or raises an error if inconsistent).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "b": {"type": "string"},
+            },
+            "required": ["A", "b"],
+        },
+    },
+    {
+        "name": "solve_homogeneous_system",
+        "description": "Solves Ax = 0 and returns a basis for the solution space (null space).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "gaussian_elimination",
+        "description": "Performs Gaussian elimination on the augmented matrix [A|b] and returns the RREF, pivot columns, and rank.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "b": {"type": "string"},
+            },
+            "required": ["A", "b"],
+        },
+    },
+    {
+        "name": "check_system_consistency",
+        "description": "Checks whether the system Ax = b is consistent (has at least one solution) by comparing ranks.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "b": {"type": "string"},
+            },
+            "required": ["A", "b"],
+        },
+    },
+    # ── Eigenvalues & Eigenvectors ───────────────────────────────────────────
+    {
+        "name": "solve_eigenvalues",
+        "description": "Returns the eigenvalues of a square matrix as a dict {eigenvalue: algebraic multiplicity}.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "solve_eigenvectors",
+        "description": "Returns the eigenvectors of a matrix as a list of (eigenvalue, multiplicity, [eigenvectors]) tuples.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "solve_characteristic_polynomial",
+        "description": "Returns the characteristic polynomial det(A - λI) as an expression in lambda.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "matrix_diagonalize",
+        "description": "Diagonalizes a matrix, returning (P, D) such that A = P * D * P⁻¹. Raises an error if not diagonalizable.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    {
+        "name": "check_diagonalizable",
+        "description": "Checks whether a matrix is diagonalizable over the complex numbers.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+            },
+            "required": ["A"],
+        },
+    },
+    # ── Least Squares ────────────────────────────────────────────────────────
+    {
+        "name": "solve_least_squares",
+        "description": "Computes the least-squares solution to the overdetermined system Ax ≈ b.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "A": {"type": "string"},
+                "b": {"type": "string"},
+            },
+            "required": ["A", "b"],
         },
     },
     # ── Matrix Decompositions ────────────────────────────────────────────────
@@ -718,7 +738,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -729,7 +749,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -740,7 +760,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -751,7 +771,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Symmetric positive-definite matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -763,7 +783,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -774,7 +794,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Symmetric square matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -785,7 +805,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Square matrix as nested JSON array"},
+                "A": {"type": "string"},
             },
             "required": ["A"],
         },
@@ -796,8 +816,8 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A":         {"type": "string", "description": "Matrix as nested JSON array"},
-                "norm_type": {"type": "string", "enum": ["fro", "frobenius", "spectral", "2"], "description": "Norm type (default: 'fro')"},
+                "A":         {"type": "string"},
+                "norm_type": {"type": "string", "enum": ["fro", "frobenius", "spectral", "2"]},
             },
             "required": ["A"],
         },
@@ -808,17 +828,399 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "A": {"type": "string", "description": "Square invertible matrix as nested JSON array"},
-                "B": {"type": "string", "description": "Right-hand side matrix as nested JSON array"},
+                "A": {"type": "string"},
+                "B": {"type": "string"},
             },
-            "required": ["A", "B"], 
+            "required": ["A", "B"],
         },
-        "cache_control": {"type": "ephemeral"}
     },
 ]
 
+_TOOLS_MULTIVAR = [
+    # ── Multivariate Differential Calculus ───────────────────────────────────
+    {
+        "name": "solve_partial_derivative",
+        "description": "Computes the partial derivative of a multivariate function with respect to one variable.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":     {"type": "string"},
+                "variable": {"type": "string"},
+            },
+            "required": ["expr", "variable"],
+        },
+    },
+    {
+        "name": "solve_gradient",
+        "description": "Computes the gradient ∇f of a scalar function. variables is a JSON array e.g. '[\"x\",\"y\"]'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":      {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["expr", "variables"],
+        },
+    },
+    {
+        "name": "solve_hessian",
+        "description": "Computes the Hessian matrix H[i,j] = ∂²f/∂x_i∂x_j.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":      {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["expr", "variables"],
+        },
+    },
+    {
+        "name": "solve_directional_derivative",
+        "description": "Computes the directional derivative of f in the given direction (automatically normalized). direction is a JSON array e.g. '[1,0]'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":      {"type": "string"},
+                "variables": {"type": "string"},
+                "direction": {"type": "string"},
+            },
+            "required": ["expr", "variables", "direction"],
+        },
+    },
+    {
+        "name": "find_critical_points_multivar",
+        "description": "Finds critical points of a multivariate function by solving ∇f = 0.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":      {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["expr", "variables"],
+        },
+    },
+    {
+        "name": "classify_critical_points_multivar",
+        "description": "Classifies critical points of a multivariate function using the Hessian matrix (local min/max/saddle).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":      {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["expr", "variables"],
+        },
+    },
+    {
+        "name": "solve_lagrange_multiplier",
+        "description": "Finds constrained extrema using Lagrange multipliers. Solves ∇f = λ∇g with constraint g = 0.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "objective":  {"type": "string"},
+                "constraint": {"type": "string"},
+                "variables":  {"type": "string"},
+            },
+            "required": ["objective", "constraint", "variables"],
+        },
+    },
+    {
+        "name": "solve_jacobian",
+        "description": "Computes the Jacobian matrix J[i,j] = ∂f_i/∂x_j. exprs and variables are JSON arrays.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "exprs":     {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["exprs", "variables"],
+        },
+    },
+]
+
+_TOOLS_MULTIVAR_INTEGRALS = [
+    # ── Multivariate Integral Calculus ────────────────────────────────────────
+    {
+        "name": "solve_double_integral",
+        "description": "Computes ∫∫ f dx dy over a rectangular region. Integration order: inner y, outer x.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr": {"type": "string"},
+                "x":    {"type": "string"},
+                "x_a":  {"type": "string"},
+                "x_b":  {"type": "string"},
+                "y":    {"type": "string"},
+                "y_a":  {"type": "string"},
+                "y_b":  {"type": "string"},
+            },
+            "required": ["expr", "x", "x_a", "x_b", "y", "y_a", "y_b"],
+        },
+    },
+    {
+        "name": "solve_triple_integral",
+        "description": "Computes ∫∫∫ f dx dy dz over a rectangular region. Integration order: inner z, then y, outer x.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr": {"type": "string"},
+                "x":    {"type": "string"},
+                "x_a":  {"type": "string"},
+                "x_b":  {"type": "string"},
+                "y":    {"type": "string"},
+                "y_a":  {"type": "string"},
+                "y_b":  {"type": "string"},
+                "z":    {"type": "string"},
+                "z_a":  {"type": "string"},
+                "z_b":  {"type": "string"},
+            },
+            "required": ["expr", "x", "x_a", "x_b", "y", "y_a", "y_b", "z", "z_a", "z_b"],
+        },
+    },
+    {
+        "name": "solve_line_integral_scalar",
+        "description": "Computes the scalar line integral ∫_C f ds along a parametric curve. expr uses spatial variables x,y (or x,y,z for 3D). curve is a JSON array of parametric expressions in the given variable e.g. '[\"cos(t)\",\"sin(t)\"]'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":     {"type": "string"},
+                "curve":    {"type": "string"},
+                "variable": {"type": "string"},
+                "a":        {"type": "string"},
+                "b":        {"type": "string"},
+            },
+            "required": ["expr", "curve", "variable", "a", "b"],
+        },
+    },
+    {
+        "name": "solve_line_integral_vector",
+        "description": "Computes the vector line integral ∫_C F·dr along a parametric curve. field and curve are JSON arrays of expressions. Spatial variables are inferred as x,y (or x,y,z).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "field":    {"type": "string"},
+                "curve":    {"type": "string"},
+                "variable": {"type": "string"},
+                "a":        {"type": "string"},
+                "b":        {"type": "string"},
+            },
+            "required": ["field", "curve", "variable", "a", "b"],
+        },
+    },
+]
+
+_TOOLS_VECTOR_ANALYSIS = [
+    # ── Vector Analysis ───────────────────────────────────────────────────────
+    {
+        "name": "solve_divergence",
+        "description": "Computes the divergence div F = Σ ∂F_i/∂x_i of a vector field. field and variables are JSON arrays.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "field":     {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["field", "variables"],
+        },
+    },
+    {
+        "name": "solve_curl",
+        "description": "Computes the curl (rotation) of a 3D vector field. field and variables are JSON arrays of length 3.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "field":     {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["field", "variables"],
+        },
+    },
+    {
+        "name": "solve_laplacian",
+        "description": "Computes the Laplacian Δf = Σ ∂²f/∂x_i² of a scalar function.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expr":      {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["expr", "variables"],
+        },
+    },
+    {
+        "name": "check_conservative",
+        "description": "Checks whether a vector field is conservative (curl F = 0). Works for 2D and 3D fields.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "field":     {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["field", "variables"],
+        },
+    },
+    {
+        "name": "solve_potential",
+        "description": "Finds the scalar potential φ of a conservative field such that ∇φ = F.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "field":     {"type": "string"},
+                "variables": {"type": "string"},
+            },
+            "required": ["field", "variables"],
+        },
+    },
+]
+
+_TOOLS_ODE = [
+    # ── Ordinary Differential Equations ──────────────────────────────────────
+    {
+        "name": "solve_ode",
+        "description": "Finds the general solution of an ODE. ode is a sympy expression equal to zero, using Derivative(y(x),x) notation. func='y', variable='x'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ode":      {"type": "string"},
+                "func":     {"type": "string"},
+                "variable": {"type": "string"},
+            },
+            "required": ["ode", "func", "variable"],
+        },
+    },
+    {
+        "name": "solve_ode_ivp",
+        "description": "Solves an ODE with initial conditions. initial_conditions is a JSON dict e.g. '{\"y(0)\": 1, \"Dy(0)\": 0}' where D-prefix means derivative.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ode":                {"type": "string"},
+                "func":               {"type": "string"},
+                "variable":           {"type": "string"},
+                "initial_conditions": {"type": "string"},
+            },
+            "required": ["ode", "func", "variable", "initial_conditions"],
+        },
+    },
+    {
+        "name": "solve_ode_separable",
+        "description": "Solves a separable ODE of the form g(y)y' = f(x).",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ode":      {"type": "string"},
+                "func":     {"type": "string"},
+                "variable": {"type": "string"},
+            },
+            "required": ["ode", "func", "variable"],
+        },
+    },
+    {
+        "name": "solve_ode_linear_first",
+        "description": "Solves a first-order linear ODE y' + p(x)y = q(x). p and q are expressions in variable.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "p":        {"type": "string"},
+                "q":        {"type": "string"},
+                "func":     {"type": "string"},
+                "variable": {"type": "string"},
+            },
+            "required": ["p", "q", "func", "variable"],
+        },
+    },
+    {
+        "name": "solve_ode_linear_second",
+        "description": "Solves a second-order linear ODE. ode uses Derivative(y(x), x, 2) notation.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "ode":      {"type": "string"},
+                "func":     {"type": "string"},
+                "variable": {"type": "string"},
+            },
+            "required": ["ode", "func", "variable"],
+        },
+    },
+]
+
+_TOOLS_UNIVERSAL = [
+    {
+        "name": "calculate",
+        "description": "Evaluates and simplifies any mathematical expression. Use this for arithmetic, algebraic simplification, or substituting values instead of computing manually.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "expression": {"type": "string"},
+            },
+            "required": ["expression"],
+        },
+    },
+]
+
+_TOOLS_PROOF = [
+    {
+        "name": "prove_by_induction",
+        "description": (
+            "Proves a formula P(n): claim_lhs(n) = claim_rhs(n) by mathematical induction. "
+            "Verifies each step with sympy.simplify(lhs - rhs).equals(0). "
+            "For sum/product proofs, pass step_term as the general summand a(n) — "
+            "it is substituted with n+1 automatically to form the inductive step: "
+            "claim_rhs(n) + step_term(n+1) = claim_rhs(n+1). "
+            "Without step_term, attempts direct algebraic verification of claim_lhs(n+1) = claim_rhs(n+1)."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "claim_lhs": {"type": "string"},
+                "claim_rhs": {"type": "string"},
+                "variable":  {"type": "string"},
+                "base":      {"type": "string"},
+                "step_term": {"type": "string"},
+            },
+            "required": ["claim_lhs", "claim_rhs", "variable", "base"],
+        },
+    },
+    {
+        "name": "algebraic_equality",
+        "description": (
+            "Proves a formula P: lhs = rhs by equality."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "lhs": {"type": "string"},
+                "rhs": {"type": "string"},
+            },
+            "required": ["lhs", "rhs"],
+        },
+    },
+]
+
+TOOLS_BY_CATEGORY: dict[str, list[dict]] = {
+    "limits":             _TOOLS_LIMITS,
+    "calculus":           _TOOLS_CALCULUS,
+    "series":             _TOOLS_SERIES,
+    "la_vectors":         _TOOLS_LA_VECTORS,
+    "la_matrices":        _TOOLS_LA_MATRICES,
+    "multivar":           _TOOLS_MULTIVAR,
+    "multivar_integrals": _TOOLS_MULTIVAR_INTEGRALS,
+    "vector_analysis":    _TOOLS_VECTOR_ANALYSIS,
+    "ode":                _TOOLS_ODE,
+    "proof":              _TOOLS_PROOF,
+}
+
+def get_tools(categories: list[str]) -> list[dict]:
+    tools = []
+    for cat in categories:
+        tools.extend(TOOLS_BY_CATEGORY.get(cat, []))
+    tools.extend(_TOOLS_UNIVERSAL)
+    tools[-1] = {**tools[-1], "cache_control": {"type": "ephemeral"}}
+    return tools
 
 TOOL_MAP = {
+    # ── General ──────────────────────────────────────────────────────────────
+    "calculate":                    wrapper._call_calculate,
     # ── Limits & Sequences ───────────────────────────────────────────────────
     "solve_limit":                  wrapper._call_solve_limit,
     "solve_limit_direction":        wrapper._call_solve_limit_direction,
@@ -845,6 +1247,7 @@ TOOL_MAP = {
     "solve_taylor_series":          wrapper._call_solve_taylor_series,
     "solve_maclaurin_series":       wrapper._call_solve_maclaurin_series,
     "check_series_convergence":     wrapper._call_check_series_convergence,
+    "solve_radius_of_convergence":  wrapper._call_solve_radius_of_convergence,
     # ── Vectors ──────────────────────────────────────────────────────────────
     "vector_dot_product":           wrapper._call_vector_dot_product,
     "vector_cross_product":         wrapper._call_vector_cross_product,
@@ -900,4 +1303,33 @@ TOOL_MAP = {
     "check_orthogonal_matrix":      wrapper._call_check_orthogonal_matrix,
     "matrix_norm":                  wrapper._call_matrix_norm,
     "solve_matrix_equation":        wrapper._call_solve_matrix_equation,
+    # ── Multivariate Differential Calculus ───────────────────────────────────
+    "solve_partial_derivative":          wrapper._call_solve_partial_derivative,
+    "solve_gradient":                    wrapper._call_solve_gradient,
+    "solve_hessian":                     wrapper._call_solve_hessian,
+    "solve_directional_derivative":      wrapper._call_solve_directional_derivative,
+    "find_critical_points_multivar":     wrapper._call_find_critical_points_multivar,
+    "classify_critical_points_multivar": wrapper._call_classify_critical_points_multivar,
+    "solve_lagrange_multiplier":         wrapper._call_solve_lagrange_multiplier,
+    "solve_jacobian":                    wrapper._call_solve_jacobian,
+    # ── Multivariate Integral Calculus ────────────────────────────────────────
+    "solve_double_integral":             wrapper._call_solve_double_integral,
+    "solve_triple_integral":             wrapper._call_solve_triple_integral,
+    "solve_line_integral_scalar":        wrapper._call_solve_line_integral_scalar,
+    "solve_line_integral_vector":        wrapper._call_solve_line_integral_vector,
+    # ── Vector Analysis ───────────────────────────────────────────────────────
+    "solve_divergence":                  wrapper._call_solve_divergence,
+    "solve_curl":                        wrapper._call_solve_curl,
+    "solve_laplacian":                   wrapper._call_solve_laplacian,
+    "check_conservative":                wrapper._call_check_conservative,
+    "solve_potential":                   wrapper._call_solve_potential,
+    # ── Ordinary Differential Equations ──────────────────────────────────────
+    "solve_ode":                         wrapper._call_solve_ode,
+    "solve_ode_ivp":                     wrapper._call_solve_ode_ivp,
+    "solve_ode_separable":               wrapper._call_solve_ode_separable,
+    "solve_ode_linear_first":            wrapper._call_solve_ode_linear_first,
+    "solve_ode_linear_second":           wrapper._call_solve_ode_linear_second,
+    # ── Proof Skills ─────────────────────────────────────────────────────────
+    "prove_by_induction":                wrapper._call_prove_by_induction,
+    "algebraic_equality":                wrapper._call_algebraic_equality,
 }

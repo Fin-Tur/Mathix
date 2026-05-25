@@ -2,7 +2,10 @@ import ast
 import json
 import sympy as sp
 import functions.ana as ana
+import functions.ana2 as ana2
 import functions.la as la
+import skills.induction as induction
+import skills.algebraic_equality as algebraic_equality
 
 # ── Parsing Helpers ───────────────────────────────────────────────────────────
 
@@ -27,6 +30,11 @@ def _parse_vectors_list(s: str) -> list:
         else:
             result.append(sp.Matrix([[sp.sympify(x) for x in row] for row in v]))
     return result
+
+# ── General ───────────────────────────────────────────────────────────────────
+
+def _call_calculate(expression):
+    return ana.calculate(sp.sympify(expression))
 
 # ── Limits & Sequences ────────────────────────────────────────────────────────
 
@@ -102,6 +110,9 @@ def _call_solve_maclaurin_series(expr, variable, n):
 
 def _call_check_series_convergence(expr, n):
     return ana.check_series_convergence(sp.sympify(expr), sp.Symbol(n))
+
+def _call_solve_radius_of_convergence(expr, variable):
+    return ana.solve_radius_of_convergence(sp.sympify(expr), sp.Symbol(variable))
 
 # ── Vectors ───────────────────────────────────────────────────────────────────
 
@@ -258,3 +269,160 @@ def _call_matrix_norm(A, norm_type="fro"):
 
 def _call_solve_matrix_equation(A, B):
     return la.solve_matrix_equation(_parse_matrix(A), _parse_matrix(B))
+
+# ── Ana2 Parsing Helpers ──────────────────────────────────────────────────────
+
+def _parse_variables(s: str) -> list[sp.Symbol]:
+    try:
+        names = json.loads(s)
+        if isinstance(names, list):
+            return [sp.Symbol(n) for n in names]
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return [sp.Symbol(n.strip()) for n in s.split(',')]
+
+def _parse_exprs_list(s: str) -> list[sp.Expr]:
+    try:
+        items = json.loads(s)
+        return [sp.sympify(str(e)) for e in items]
+    except (json.JSONDecodeError, ValueError):
+        return [sp.sympify(e.strip()) for e in s.split(',')]
+
+def _parse_ode_context(func: str, variable: str):
+    x = sp.Symbol(variable)
+    f = sp.Function(func)
+    return x, f, {variable: x, func: f}
+
+def _parse_ics(ics_str: str, func: str, variable: str) -> dict:
+    data = json.loads(ics_str)
+    x = sp.Symbol(variable)
+    f = sp.Function(func)
+    result = {}
+    for key, val in data.items():
+        key = key.strip()
+        n_deriv = 0
+        name_part = key
+        while name_part.startswith('D'):
+            n_deriv += 1
+            name_part = name_part[1:]
+        pt_str = name_part.split('(')[1].rstrip(')')
+        pt = sp.sympify(pt_str)
+        sym_key = f(pt) if n_deriv == 0 else f(x).diff(x, n_deriv).subs(x, pt)
+        result[sym_key] = sp.sympify(str(val))
+    return result
+
+# ── Multivariate Differential Calculus ───────────────────────────────────────
+
+def _call_solve_partial_derivative(expr, variable):
+    return ana2.solve_partial_derivative(sp.sympify(expr), sp.Symbol(variable))
+
+def _call_solve_gradient(expr, variables):
+    return ana2.solve_gradient(sp.sympify(expr), _parse_variables(variables))
+
+def _call_solve_hessian(expr, variables):
+    return ana2.solve_hessian(sp.sympify(expr), _parse_variables(variables))
+
+def _call_solve_directional_derivative(expr, variables, direction):
+    return ana2.solve_directional_derivative(sp.sympify(expr), _parse_variables(variables), _parse_exprs_list(direction))
+
+def _call_find_critical_points_multivar(expr, variables):
+    return ana2.find_critical_points_multivar(sp.sympify(expr), _parse_variables(variables))
+
+def _call_classify_critical_points_multivar(expr, variables):
+    return ana2.classify_critical_points_multivar(sp.sympify(expr), _parse_variables(variables))
+
+def _call_solve_lagrange_multiplier(objective, constraint, variables):
+    return ana2.solve_lagrange_multiplier(sp.sympify(objective), sp.sympify(constraint), _parse_variables(variables))
+
+def _call_solve_jacobian(exprs, variables):
+    return ana2.solve_jacobian(_parse_exprs_list(exprs), _parse_variables(variables))
+
+# ── Multivariate Integral Calculus ────────────────────────────────────────────
+
+def _call_solve_double_integral(expr, x, x_a, x_b, y, y_a, y_b):
+    return ana2.solve_double_integral(
+        sp.sympify(expr),
+        sp.Symbol(x), sp.sympify(x_a), sp.sympify(x_b),
+        sp.Symbol(y), sp.sympify(y_a), sp.sympify(y_b),
+    )
+
+def _call_solve_triple_integral(expr, x, x_a, x_b, y, y_a, y_b, z, z_a, z_b):
+    return ana2.solve_triple_integral(
+        sp.sympify(expr),
+        sp.Symbol(x), sp.sympify(x_a), sp.sympify(x_b),
+        sp.Symbol(y), sp.sympify(y_a), sp.sympify(y_b),
+        sp.Symbol(z), sp.sympify(z_a), sp.sympify(z_b),
+    )
+
+def _call_solve_line_integral_scalar(expr, curve, variable, a, b):
+    t = sp.Symbol(variable)
+    curve_exprs = _parse_exprs_list(curve)
+    spatial = [sp.Symbol('x'), sp.Symbol('y'), sp.Symbol('z')][:len(curve_exprs)]
+    return ana2.solve_line_integral_scalar(sp.sympify(expr), curve_exprs, spatial, t, sp.sympify(a), sp.sympify(b))
+
+def _call_solve_line_integral_vector(field, curve, variable, a, b):
+    t = sp.Symbol(variable)
+    field_exprs = _parse_exprs_list(field)
+    curve_exprs = _parse_exprs_list(curve)
+    spatial = [sp.Symbol('x'), sp.Symbol('y'), sp.Symbol('z')][:len(field_exprs)]
+    return ana2.solve_line_integral_vector(field_exprs, curve_exprs, spatial, t, sp.sympify(a), sp.sympify(b))
+
+# ── Vector Analysis ───────────────────────────────────────────────────────────
+
+def _call_solve_divergence(field, variables):
+    return ana2.solve_divergence(_parse_exprs_list(field), _parse_variables(variables))
+
+def _call_solve_curl(field, variables):
+    return ana2.solve_curl(_parse_exprs_list(field), _parse_variables(variables))
+
+def _call_solve_laplacian(expr, variables):
+    return ana2.solve_laplacian(sp.sympify(expr), _parse_variables(variables))
+
+def _call_check_conservative(field, variables):
+    return ana2.check_conservative(_parse_exprs_list(field), _parse_variables(variables))
+
+def _call_solve_potential(field, variables):
+    return ana2.solve_potential(_parse_exprs_list(field), _parse_variables(variables))
+
+# ── Ordinary Differential Equations ──────────────────────────────────────────
+
+def _call_solve_ode(ode, func, variable):
+    x, f, ctx = _parse_ode_context(func, variable)
+    ode_expr = sp.sympify(ode, locals=ctx)
+    return ana2.solve_ode(ode_expr, f, x)
+
+def _call_solve_ode_ivp(ode, func, variable, initial_conditions):
+    x, f, ctx = _parse_ode_context(func, variable)
+    ode_expr = sp.sympify(ode, locals=ctx)
+    ics = _parse_ics(initial_conditions, func, variable)
+    return ana2.solve_ode_ivp(ode_expr, f, x, ics)
+
+def _call_solve_ode_separable(ode, func, variable):
+    x, f, ctx = _parse_ode_context(func, variable)
+    ode_expr = sp.sympify(ode, locals=ctx)
+    return ana2.solve_ode_separable(ode_expr, f, x)
+
+def _call_solve_ode_linear_first(p, q, func, variable):
+    x, f, _ = _parse_ode_context(func, variable)
+    return ana2.solve_ode_linear_first(sp.sympify(p), sp.sympify(q), f, x)
+
+def _call_solve_ode_linear_second(ode, func, variable):
+    x, f, ctx = _parse_ode_context(func, variable)
+    ode_expr = sp.sympify(ode, locals=ctx)
+    return ana2.solve_ode_linear_second(ode_expr, f, x)
+
+# ── Proof Skills ──────────────────────────────────────────────────────────────
+
+def _call_prove_by_induction(claim_lhs, claim_rhs, variable, base, step_term=""):
+    n = sp.Symbol(variable, integer=True, positive=True)
+    ctx = {variable: n}
+    lhs = sp.sympify(claim_lhs, locals=ctx)
+    rhs = sp.sympify(claim_rhs, locals=ctx)
+    b = sp.sympify(base)
+    st = sp.sympify(step_term, locals=ctx) if step_term.strip() else None
+    return induction.prove_by_induction(lhs, rhs, n, b, st)
+
+def _call_algebraic_equality(lhs, rhs):
+    lhs = sp.simplify(lhs)
+    rhs = sp.simplify(rhs)
+    return algebraic_equality.verify(lhs, rhs)
