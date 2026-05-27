@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-navy-950 text-white antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply min-h-screen;
+  }
+
+  * {
+    @apply border-navy-700;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: theme('colors.navy.900');
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.glow.600');
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.glow.500');
+  }
+}
+
+@layer utilities {
+  /* Nur auf dem Titel — sehr dezent */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(96, 165, 250, 0.25);
+  }
+
+  .text-glow-sm {
+    text-shadow: none;
+  }
+
+  .text-glow-lg {
+    text-shadow: 0 0 12px rgba(96, 165, 250, 0.30);
+  }
+
+  .border-glow {
+    box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.15);
+  }
+}
